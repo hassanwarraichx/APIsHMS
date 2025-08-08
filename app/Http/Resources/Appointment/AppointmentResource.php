@@ -21,15 +21,13 @@ class AppointmentResource extends JsonResource
             'notes'            => $this->notes,
 
             'doctor' => [
-                //'id'    => optional($this->doctor)->id,
-                'name'  => optional($this->doctor->user)->name,
-                'email' => optional($this->doctor->user)->email,
+                'name'  => optional($this->doctor)->name,
+                'email' => optional($this->doctor)->email,
             ],
 
             'patient' => [
-                //'id'    => optional($this->patient)->id,
-                'name'  => optional($this->patient->user)->name,
-                'email' => optional($this->patient->user)->email,
+                'name'  => optional($this->patient)->name,
+                'email' => optional($this->patient)->email,
             ],
 
             'created_at' => $this->created_at?->toDateTimeString(),

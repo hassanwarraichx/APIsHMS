@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\API\Appointment\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\Billing\BillingController;
@@ -133,7 +134,7 @@ Route::middleware('auth:api')->group(function () {
     Doctor Routes
     */
     Route::prefix('doctor')->middleware('role:doctor')->group(function () {
-        Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus']);
+        //Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus']);
         Route::post('/prescriptions', [PrescriptionController::class, 'store']);
         Route::get('/prescription/appointments/{appointment}', [PrescriptionController::class, 'show']);
 
@@ -176,6 +177,8 @@ Route::middleware('auth:api')->group(function () {
 
         // Appointment deletion only admin can
         Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy']);
+        //Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus']);
+
     });
 
     /*
@@ -186,8 +189,14 @@ Route::middleware('auth:api')->group(function () {
 
 
 });
+// Allow both admin and doctor to access this route
+Route::middleware(['auth:api', 'role:admin|doctor'])->patch(
+    '/appointments/{appointment}/status',
+    [AppointmentController::class, 'updateStatus']
+);
+
 
 Route::any('{any}', function () {
-    return \App\Helpers\ResponseHelper::error("api not found please check your method.",404);
+    return ResponseHelper::error("api not found please check your method.",404);
 })->where('any', '.*');
 

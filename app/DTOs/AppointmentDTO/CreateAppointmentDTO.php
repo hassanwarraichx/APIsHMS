@@ -13,7 +13,7 @@ class CreateAppointmentDTO extends BaseDTO
 
     public function __construct(array $data)
     {
-        $this->patient_id = $data['patient_id'];
+        $this->patient_id       = auth()->id(); // ✅ Assign from authenticated user
         $this->doctor_id = $data['doctor_id'];
         $this->appointment_time = $data['appointment_time'];
         $this->notes = $data['notes'] ?? null;

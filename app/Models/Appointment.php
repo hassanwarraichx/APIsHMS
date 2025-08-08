@@ -15,14 +15,24 @@ class Appointment extends Model
         'status',     // 'pending', 'approved', 'rejected'
         'notes',
     ];
+//    public function doctor()
+//    {
+//        return $this->belongsTo(DoctorProfile::class);
+//    }
+    public function patient()
+    {
+        return $this->belongsTo(User::class, 'patient_id');
+    }
     public function doctor()
     {
-        return $this->belongsTo(DoctorProfile::class);
+        return $this->belongsTo(User::class, 'doctor_id');
     }
 
-    public function patient(){
-        return $this->belongsTo(PatientProfile::class, 'patient_id');
-    }
+
+
+//    public function patient(){
+//        return $this->belongsTo(PatientProfile::class, 'patient_id');
+//    }
     protected $casts = [
         'appointment_time' => 'datetime',
     ];

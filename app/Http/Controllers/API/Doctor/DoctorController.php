@@ -67,6 +67,10 @@ class DoctorController extends Controller
     public function update(UpdateDoctorRequest $request, $id)
     {
         //dd($request->all());
+        $user = User::where('id',$id)->exists();
+        if (!$user) {
+            return ResponseHelper::error('Doctor not found or does not have the required role.', 404);
+        }
 
         $data = $request->validated();
         $data['user_id'] = $id;

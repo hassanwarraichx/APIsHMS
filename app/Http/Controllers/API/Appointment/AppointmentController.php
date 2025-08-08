@@ -41,9 +41,8 @@ class AppointmentController extends Controller
             $data = $request->all();
 
             if (Auth::user()->hasRole('patient')) {
-                $data['patient_id'] = Auth::user()->patientProfile->id ?? null;
+                $data['patient_id'] = Auth::id(); // instead of Auth::user()->patientProfile->id;
             }
-
 
             $dto = new CreateAppointmentDTO($data);
             $appointment = $this->service->create($dto);
@@ -107,9 +106,13 @@ class AppointmentController extends Controller
             $this->service->updateStatus($appointment, $request->status);
 
              // Notification logic
-             if ($appointment->patient && $appointment->patient->user) {
-                 $appointment->patient->user->notify(new AppointmentStatusChanged($appointment));
-             }
+//             if ($appointment->patient && $appointment->patient->user) {
+//                 $appointment->patient->user->notify(new AppointmentStatusChanged($appointment));
+//             }
+            if ($appointment->patient) {
+                $appointment->patient->notify(new AppointmentStatusChanged($appointment));
+            }
+
 
             return ResponseHelper::success(
                 new AppointmentResource($appointment),

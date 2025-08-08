@@ -4,6 +4,7 @@ namespace App\Services\Doctor;
 
 use App\DTOs\DoctorDTO\CreateDoctorDTO;
 use App\DTOs\DoctorDTO\UpdateDoctorDTO;
+use App\Helpers\ResponseHelper;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +40,8 @@ class DoctorService
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
-            throw $e;
+            //throw $e;
+            //return ResponseHelper::error("Failed to create a doctor",422);
         }
     }
 
@@ -109,7 +111,7 @@ class DoctorService
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
-            throw $e;
+            //throw $e;
         }
     }
 

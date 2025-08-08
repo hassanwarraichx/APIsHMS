@@ -13,23 +13,46 @@ use Illuminate\Support\Facades\DB;
 
 class AppointmentService
 {
+//    public function forUserQuery(?User $user = null)
+//    {
+//        $user = $user ?? auth()->user();
+//
+//        if ($user->hasRole('admin')) {
+//            return Appointment::with(['patient.user', 'doctor.user'])->latest();
+//        }
+//
+//        if ($user->hasRole('doctor') && $user->doctorProfile) {
+//            return Appointment::where('doctor_id', $user->doctorProfile->id)
+//                ->with(['patient.user'])
+//                ->latest();
+//        }
+//
+//        if ($user->hasRole('patient') && $user->patientProfile) {
+//            return Appointment::where('patient_id', $user->patientProfile->id)
+//                ->with(['doctor.user'])
+//                ->latest();
+//        }
+//
+//        return Appointment::query()->whereRaw('0 = 1');
+//    }
+
     public function forUserQuery(?User $user = null)
     {
         $user = $user ?? auth()->user();
 
         if ($user->hasRole('admin')) {
-            return Appointment::with(['patient.user', 'doctor.user'])->latest();
+            return Appointment::with(['patient', 'doctor'])->latest();
         }
 
         if ($user->hasRole('doctor') && $user->doctorProfile) {
             return Appointment::where('doctor_id', $user->doctorProfile->id)
-                ->with(['patient.user'])
+                ->with(['patient'])
                 ->latest();
         }
 
         if ($user->hasRole('patient') && $user->patientProfile) {
             return Appointment::where('patient_id', $user->patientProfile->id)
-                ->with(['doctor.user'])
+                ->with(['doctor'])
                 ->latest();
         }
 
