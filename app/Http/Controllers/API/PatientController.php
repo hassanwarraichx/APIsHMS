@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Patient\StorePatientRequest;
 use App\Http\Requests\Patient\UpdatePatientRequest;
 use App\Http\Resources\Patient\PatientResource;
+use App\Models\PatientProfile;
 use App\Models\User;
 use App\Services\Patient\PatientService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -30,12 +31,11 @@ class PatientController extends Controller
     public function index(Request $request)
     {
         $query = app(Pipeline::class)
-            ->send(User::query()->role('patient'))
+            ->send(User::query()->role('patient')->latest()->withoutTrashed())
             ->through([
                 NameFilter::class,
             ])
             ->thenReturn();
-
 
         $perPage = $request->get('per_page', 10);
 
@@ -82,20 +82,40 @@ class PatientController extends Controller
         }
     }
 
-    public function update(UpdatePatientRequest $request, $id)
+    public function update(UpdatePatientRequest $request, $user_id)
     {
-        $dto = new UpdatePatientDTO($request, $id);
+//        dd($request->all(), $user_id);
+        $user = User::where('id',$user_id)->exists();
+        if (!$user) {
+            return ResponseHelper::error('Patient not found or does not have the required role.', 404);
+        }
+        $dto = new UpdatePatientDTO($request, $user_id);
         $this->patientService->update($dto);
 
-        $patient = User::role('patient')->with('patientProfile')->findOrFail($id);
+        $patient = User::role('patient')->with('patientProfile')->findOrFail($user_id);
         return ResponseHelper::success(new PatientResource($patient), 'Patient updated successfully.');
     }
 
     public function destroy($id)
     {
-        $patient = User::role('patient')->findOrFail($id);
+        $patient = User::withTrashed()->find($id);
+
+        if (!$patient) {
+            return ResponseHelper::error('Patient not found.', 404);
+        }
+
+        if ($patient->trashed()) {
+            return ResponseHelper::error('Patient is already deleted.', 400);
+        }
+
+        if (!$patient->hasRole('patient')) {
+            return ResponseHelper::error('The user is not a patient.', 400);
+        }
+
         $patient->delete();
 
         return ResponseHelper::success(null, 'Patient deleted successfully.');
     }
+
+
 }

@@ -21,13 +21,13 @@ class AppointmentResource extends JsonResource
             'notes'            => $this->notes,
 
             'doctor' => [
-                'id'    => optional($this->doctor)->id,
+                //'id'    => optional($this->doctor)->id,
                 'name'  => optional($this->doctor->user)->name,
                 'email' => optional($this->doctor->user)->email,
             ],
 
             'patient' => [
-                'id'    => optional($this->patient)->id,
+                //'id'    => optional($this->patient)->id,
                 'name'  => optional($this->patient->user)->name,
                 'email' => optional($this->patient->user)->email,
             ],

@@ -15,7 +15,7 @@ class BillingResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'                => $this->id,
+            //'id'                => $this->id,
             'appointment_id'    => $this->appointment_id,
             'consultation_fee'  => $this->consultation_fee,
             'medicine_fee'      => $this->medicine_fee,

@@ -16,3 +16,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::post('/test-upload', function (Illuminate\Http\Request $request) {
+    if ($request->hasFile('profile_picture')) {
+        $path = $request->file('profile_picture')->store('public/profile_picture');
+        return response()->json(['stored_path' => $path]);
+    }
+    return response()->json(['error' => 'No file uploaded']);
+});
+

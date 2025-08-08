@@ -7,6 +7,7 @@ use App\Http\Controllers\API\Doctor\DoctorController;
 use App\Http\Controllers\API\Medicine\MedicineController;
 use App\Http\Controllers\API\PatientController;
 use App\Http\Controllers\API\Prescription\PrescriptionController;
+use App\Http\Controllers\Specialization\SpecializationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -107,6 +108,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/register', [AuthController::class, 'register']);
+
 
 
 /*
@@ -133,6 +136,7 @@ Route::middleware('auth:api')->group(function () {
         Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus']);
         Route::post('/prescriptions', [PrescriptionController::class, 'store']);
         Route::get('/prescription/appointments/{appointment}', [PrescriptionController::class, 'show']);
+
     });
 
     /*
@@ -153,6 +157,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/doctors/{doctor}', [DoctorController::class, 'show']);
         Route::put('/doctors/{doctor}', [DoctorController::class, 'update']);
         Route::delete('/doctors/{doctor}', [DoctorController::class, 'destroy']);
+        Route::get('/specializations', [SpecializationController::class, 'index']);
+
 
         // Medicines
         Route::get('/medicines/export', [MedicineController::class, 'export']);
@@ -177,5 +183,11 @@ Route::middleware('auth:api')->group(function () {
     */
     Route::get('/appointments', [AppointmentController::class, 'index']);
     Route::get('/appointments/{appointment}', [AppointmentController::class, 'show']);
+
+
 });
+
+Route::any('{any}', function () {
+    return \App\Helpers\ResponseHelper::error("api not found please check your method.",404);
+})->where('any', '.*');
 

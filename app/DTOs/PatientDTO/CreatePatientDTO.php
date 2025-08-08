@@ -21,6 +21,8 @@ class CreatePatientDTO extends BaseDTO
 
     public function __construct(Request $request)
     {
+        logger('profile_picture is present: ' . var_export($request->hasFile('profile_picture'), true));
+        logger('all files:', $request->allFiles());
         $this->name = $request->name;
         $this->email = $request->email;
         $this->password = $request->password;
@@ -29,6 +31,9 @@ class CreatePatientDTO extends BaseDTO
         $this->address = $request->address;
         $this->phone = $request->phone;
         $this->profile_picture = $request->file('profile_picture');
+//        if (!$this->profile_picture) {
+//            logger('Profile picture not found in request');
+//        }
         $this->medical_histories = is_array($request->medical_histories) ? $request->medical_histories : [];
     }
 }

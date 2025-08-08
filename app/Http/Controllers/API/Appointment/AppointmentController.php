@@ -44,6 +44,7 @@ class AppointmentController extends Controller
                 $data['patient_id'] = Auth::user()->patientProfile->id ?? null;
             }
 
+
             $dto = new CreateAppointmentDTO($data);
             $appointment = $this->service->create($dto);
 

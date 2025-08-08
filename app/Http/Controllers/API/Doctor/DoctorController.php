@@ -28,13 +28,13 @@ class DoctorController extends Controller
     public function index(Request $request)
     {
         $query = app(Pipeline::class)
-            ->send(User::query()->role('doctor'))
+            ->send(User::query()->role('doctor')->latest())
             ->through([
                 NameFilter::class,
             ])
             ->thenReturn();
 
-        $perPage = $request->get('per_page', 10);
+        $perPage = $request->get('per_page', 25);
         $paginated = $query->paginate($perPage);
         return ResponseHelper::success(
             DoctorResource::collection($paginated),
@@ -80,9 +80,26 @@ class DoctorController extends Controller
 
     public function destroy($id)
     {
-        $doctor = User::role('doctor')->findOrFail($id);
+        $doctor = User::withTrashed()->find($id);
+
+        if (!$doctor) {
+            return ResponseHelper::error('Patient not found.', 404);
+        }
+
+        if ($doctor->trashed()) {
+            return ResponseHelper::error('Patient is already deleted.', 400);
+        }
+
+        if (!$doctor->hasRole('doctor')) {
+            return ResponseHelper::error('The user is not a patient.', 400);
+        }
+
         $doctor->delete();
 
         return ResponseHelper::success(null, 'Doctor deleted successfully.');
     }
+
+
+
+
 }

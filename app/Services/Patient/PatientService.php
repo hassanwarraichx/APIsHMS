@@ -12,47 +12,104 @@ use Illuminate\Support\Facades\Hash;
 
 class PatientService
 {
+//    public function create(CreatePatientDTO $dto): User
+//    {
+//        DB::beginTransaction();
+//
+//        try {
+//            $data = $dto->toArray();
+//
+//            $userData = [
+//                'name' => $data['name'],
+//                'email' => $data['email'],
+//                'password' => Hash::make($data['password']),
+//            ];
+//
+//            if ($dto->profile_picture) {
+//                $path = $dto->profile_picture->store('public/profile_picture');
+//                $userData['profile_picture'] = str_replace('public/', '', $path);
+//            }
+//
+//            //dd($userData);
+//            $user = User::create($userData);
+//            $user->assignRole('patient');
+//
+//            $profileData = [
+//                'dob'     => $data['dob'],
+//                'gender'  => $data['gender'],
+//                'address' => $data['address'],
+//                'phone'   => $data['phone'] ?? null,
+//            ];
+//
+//            $patientProfile = $user->patientProfile()->create($profileData);
+//
+//            foreach ($data['medical_histories'] ?? [] as $history) {
+//                $description = $history['description'] ?? null;
+//                $document = $history['document'] ?? null;
+//
+//                if (empty($description) && empty($document)) continue;
+//
+//                $path = $document ? $document->store('medical_documents', 'public') : null;
+//
+//                $patientProfile->medicalHistories()->create([
+//                    'description'    => $description,
+//                    'document_path'  => $path,
+//                ]);
+//            }
+//
+//            DB::commit();
+//            return $user;
+//        } catch (\Throwable $e) {
+//            DB::rollBack();
+//            throw $e;
+//        }
+//    }
+
     public function create(CreatePatientDTO $dto): User
     {
         DB::beginTransaction();
 
         try {
-            $data = $dto->toArray();
-
+            // Step 1: Prepare user data
             $userData = [
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
+                'name'     => $dto->name,
+                'email'    => $dto->email,
+                'password' => Hash::make($dto->password),
             ];
 
+            // Step 2: Handle profile picture
             if ($dto->profile_picture) {
                 $path = $dto->profile_picture->store('public/profile_picture');
                 $userData['profile_picture'] = str_replace('public/', '', $path);
             }
 
+            // Step 3: Create user and assign role
             $user = User::create($userData);
             $user->assignRole('patient');
 
+            // Step 4: Create patient profile
             $profileData = [
-                'dob'     => $data['dob'],
-                'gender'  => $data['gender'],
-                'address' => $data['address'],
-                'phone'   => $data['phone'] ?? null,
+                'dob'     => $dto->dob,
+                'gender'  => $dto->gender,
+                'address' => $dto->address,
+                'phone'   => $dto->phone ?? null,
             ];
-
             $patientProfile = $user->patientProfile()->create($profileData);
 
-            foreach ($data['medical_histories'] ?? [] as $history) {
+            // Step 5: Create medical histories
+            foreach ($dto->medical_histories ?? [] as $history) {
                 $description = $history['description'] ?? null;
                 $document = $history['document'] ?? null;
 
-                if (empty($description) && empty($document)) continue;
+                if (empty($description) && empty($document)) {
+                    continue;
+                }
 
                 $path = $document ? $document->store('medical_documents', 'public') : null;
 
                 $patientProfile->medicalHistories()->create([
-                    'description'    => $description,
-                    'document_path'  => $path,
+                    'description'   => $description,
+                    'document_path' => $path,
                 ]);
             }
 
